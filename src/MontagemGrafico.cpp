@@ -1,277 +1,250 @@
 #include "../include/MontagemGrafico.hpp"
 #include <string>
+#include <algorithm>
 
-// Construir Sinal
+static const int MAX_BITS_EXIBIDOS = 32;
 
-// Função responsável por criar uma moldura para encapsular o gráfico
-string construir_moldura(string linha) {
-    int tamanho_moldura = linha.length();
-    string moldura = "|";
-    for (int i = 0; i < tamanho_moldura - 2; i++) {
-        moldura += "-";
+// Exibe regua com valores dos bits originais acima da onda
+static void exibir_regua(vector<char> quadro, int largura_bit, int num_bits) {
+    cout << "  Bits: ";
+    for (int i = 0; i < num_bits; i++) {
+        cout << quadro[i];
+        for (int j = 1; j < largura_bit; j++) cout << " ";
     }
-    moldura += "|";
-
-    return moldura;
+    cout << endl;
 }
 
-// Função que monta o gráfico do sinal binário
+// Sinal Binario (NRZ) — duas linhas: HIGH e LOW
 void construir_sinal_binario(vector<char> quadro) {
-    int largura_desenho_em_espaco;
-    int maxima_largura_desenho_em_espaco = 40;
-    int numero_de_espacos_para_desenhar_bit = 4;
+    int num_bits = min((int)quadro.size(), MAX_BITS_EXIBIDOS);
+    int largura = 4;
 
-    // Estrutura que limita a representação de 4 caracteres.
-    int diferenca = ((quadro.size() * numero_de_espacos_para_desenhar_bit) - maxima_largura_desenho_em_espaco);
-    if (diferenca > 0) {
-        largura_desenho_em_espaco = maxima_largura_desenho_em_espaco;
-    } else {
-        largura_desenho_em_espaco = quadro.size();
-    }
+    exibir_regua(quadro, largura, num_bits);
 
-    // Imprimindo o sinal completo
-    for (int i = 0; i < quadro.size(); i++) {
-        cout << quadro[i];
-    }
+    string linha_high = "   H  ";
+    string linha_low  = "   L  ";
 
-    cout << "\n";
+    char anterior = '0';
 
-    string segunda_linha, terceira_linha, quarta_linha, quinta_linha;
-    segunda_linha = terceira_linha = quarta_linha = quinta_linha = "|";
-
-    char ultimo_bit_desenhado = 'i';
-
-    // Construção do Gráfico
-    for (int i = 0; i < largura_desenho_em_espaco; i++) {
-        if (quadro[i] == '1' && ultimo_bit_desenhado == 'i') {
-            segunda_linha += "***";
-            terceira_linha += "   ";
-            quarta_linha += "   ";
-            quinta_linha += "   ";
-            ultimo_bit_desenhado = '1';
-        } else if (quadro[i] == '0' && ultimo_bit_desenhado == 'i') {
-            segunda_linha += "   ";
-            terceira_linha += "   ";
-            quarta_linha += "   ";
-            quinta_linha += "***";
-            ultimo_bit_desenhado = '0';
-        } else if (quadro[i] == '1' && quadro[i] != ultimo_bit_desenhado) {
-            segunda_linha += "****";
-            terceira_linha += "*   ";
-            quarta_linha += "*   ";
-            quinta_linha += "*   ";
-            ultimo_bit_desenhado = '1';
-        } else if (quadro[i] == '1' && quadro[i] == ultimo_bit_desenhado) {
-            segunda_linha += "***";
-            terceira_linha += "   ";
-            quarta_linha += "   ";
-            quinta_linha += "   ";
-            ultimo_bit_desenhado = '1';
-        } else if (quadro[i] == '0' && quadro[i] != ultimo_bit_desenhado) {
-            segunda_linha += "*   ";
-            terceira_linha += "*   ";
-            quarta_linha += "*   ";
-            quinta_linha += "****";
-            ultimo_bit_desenhado = '0';
-        } else if (quadro[i] == '0' && quadro[i] == ultimo_bit_desenhado) {
-            segunda_linha += "   ";
-            terceira_linha += "   ";
-            quarta_linha += "   ";
-            quinta_linha += "***";
-            ultimo_bit_desenhado = '0';
-        }
-    }
-
-    string moldura = construir_moldura(segunda_linha);
-
-    segunda_linha += "|";
-    terceira_linha += "|";
-    quarta_linha += "|";
-    quinta_linha += "|";
-
-    // Imprimindo gráfico no terminal
-    cout << moldura << endl;
-    cout << segunda_linha << endl;
-    cout << terceira_linha << endl;
-    cout << quarta_linha << endl;
-    cout << quinta_linha << endl;
-    cout << moldura << endl;
-}
-
-// Função que monta o gráfico do sinal manchester
-void construir_sinal_manchester(vector<char> quadro) {
-    int largura_desenho_em_espaco;
-    int maxima_largura_desenho_em_espaco = 40;
-
-    // Estrutura que limita a representação de 4 caracteres.
-    int diferenca = (quadro.size() - maxima_largura_desenho_em_espaco);
-    if (diferenca > 0) {
-        largura_desenho_em_espaco = maxima_largura_desenho_em_espaco;
-    } else {
-        largura_desenho_em_espaco = quadro.size();
-    }
-
-    string segunda_linha = "|";
-    string terceira_linha = "|";
-    string quarta_linha = "|";
-    string quinta_linha = "|";
-
-    // Imprimindo o sinal completo
-    for (int i = 0; i < quadro.size(); i++) {
-        cout << quadro[i];
-    }
-
-    cout << "\n";
-
-    // Construção do Gráfico
-    for (int i = 0; i < largura_desenho_em_espaco; i += 2) {
-        string bit_codificado;
-        for (int j = i; (j < (i + 2)); j++) {
-            bit_codificado += quadro[j];
-        }
-        terceira_linha += "  *  ";
-        quarta_linha += "  *  ";
-        if (bit_codificado == "01") {
-            segunda_linha += "  ***";
-            quinta_linha += "***  ";
-        } else {
-            segunda_linha += "***  ";
-            quinta_linha += "  ***";
-        }
-    }
-    segunda_linha += "|";
-    terceira_linha += "|";
-    quarta_linha += "|";
-    quinta_linha += "|";
-
-    string moldura = construir_moldura(quinta_linha);
-
-    // Imprimindo gráfico no terminal
-    cout << moldura << endl;
-    cout << segunda_linha << endl;
-    cout << terceira_linha << endl;
-    cout << quarta_linha << endl;
-    cout << quinta_linha << endl;
-    cout << moldura << endl;
-}
-
-// Função que monta o gráfico do sinal bipolar
-void construir_sinal_bipolar(vector<char> quadro) {
-    int largura_desenho_em_espaco;
-    int maxima_largura_desenho_em_espaco = 40;
-    int quantidade_de_traco = 0;
-
-    // Estrutura que limita a representação de 4 caracteres.
-    for (int i = 0; i < quadro.size(); i++) {
-        if (quadro[i] == '-') {
-            quantidade_de_traco += 1;
-        }
-    }
-
-    int diferenca = (((quadro.size() - quantidade_de_traco)) - maxima_largura_desenho_em_espaco);
-    if (diferenca > 0) {
-        largura_desenho_em_espaco = maxima_largura_desenho_em_espaco;
-    } else {
-        largura_desenho_em_espaco = quadro.size();
-    }
-
-    string segunda_linha, terceira_linha, quarta_linha, quinta_linha, sexta_linha, setima_linha, oitava_linha;
-    segunda_linha = terceira_linha = quarta_linha = quinta_linha = sexta_linha = setima_linha = oitava_linha = "|";
-
-    // Imprimindo o sinal completo
-    for (int i = 0; i < quadro.size(); i++) {
-        cout << quadro[i];
-    }
-
-    cout << "\n";
-
-    // Construção do Gráfico
-    for (int i = 0; i < largura_desenho_em_espaco; i++) {
-        if (quadro[i] == '-') {
-            continue;
-        }
-        terceira_linha += "   ";
-        quarta_linha   += "   ";
-        sexta_linha    += "   ";
-        setima_linha   += "   ";
-        if (quadro[i] == '0') {
-            segunda_linha += "   ";
-            quinta_linha  += "***";
-            oitava_linha  += "   ";
-        } else if (quadro[i] == '1' && quadro[i - 1] != '-') {
-            segunda_linha += "***";
-            quinta_linha  += "   ";
-            oitava_linha  += "   ";
-        } else if (quadro[i] == '1' && quadro[i - 1] == '-') {
-            segunda_linha += "   ";
-            quinta_linha  += "   ";
-            oitava_linha  += "***";
-        }
-        
-        if (i < largura_desenho_em_espaco - 1 && quadro[i] != '-') {
-            if (quadro[i] == '0' && quadro[i + 1] == '0') {
-                continue;
-            } else if (quadro[i] == '1' && quadro[i + 1] != '0') {
-                segunda_linha  += "*";
-                terceira_linha += "*";
-                quarta_linha   += "*";
-                quinta_linha   += "*";
-                sexta_linha    += "*";
-                setima_linha   += "*";
-                oitava_linha   += "*";
-            } else if (quadro[i - 1] != '-' && quadro[i + 1] != '-') {
-                segunda_linha  += "*";
-                terceira_linha += "*";
-                quarta_linha   += "*";
-                quinta_linha   += "*";
-                sexta_linha    += " ";
-                setima_linha   += " ";
-                oitava_linha   += " ";
+    for (int i = 0; i < num_bits; i++) {
+        if (quadro[i] == '1') {
+            if (anterior == '0') {
+                linha_high += "┌";
+                linha_low  += "┘";
             } else {
-                segunda_linha  += " ";
-                terceira_linha += " ";
-                quarta_linha   += " ";
-                quinta_linha   += "*";
-                sexta_linha    += "*";
-                setima_linha   += "*";
-                oitava_linha   += "*";
+                linha_high += "─";
+                linha_low  += " ";
+            }
+            for (int j = 1; j < largura; j++) {
+                linha_high += "─";
+                linha_low  += " ";
+            }
+        } else {
+            if (anterior == '1') {
+                linha_high += "┐";
+                linha_low  += "└";
+            } else {
+                linha_high += " ";
+                linha_low  += "─";
+            }
+            for (int j = 1; j < largura; j++) {
+                linha_high += " ";
+                linha_low  += "─";
+            }
+        }
+        anterior = quadro[i];
+    }
+
+    cout << linha_high << endl;
+    cout << linha_low << endl;
+
+    if ((int)quadro.size() > MAX_BITS_EXIBIDOS) {
+        cout << "  ... (" << quadro.size() - MAX_BITS_EXIBIDOS << " bits restantes omitidos)" << endl;
+    }
+}
+
+// Sinal Manchester — transicao no meio de cada bit
+void construir_sinal_manchester(vector<char> quadro) {
+    int num_pares = min((int)quadro.size() / 2, MAX_BITS_EXIBIDOS);
+    int largura = 3;
+
+    // Regua com bits originais decodificados
+    cout << "  Bits: ";
+    for (int i = 0; i < num_pares; i++) {
+        string par;
+        par += quadro[i * 2];
+        par += quadro[i * 2 + 1];
+        char bit_original = (par == "01") ? '0' : '1';
+        cout << bit_original;
+        for (int j = 1; j < largura * 2; j++) cout << " ";
+    }
+    cout << endl;
+
+    string linha_high = "   H  ";
+    string linha_low  = "   L  ";
+
+    for (int i = 0; i < num_pares; i++) {
+        string par;
+        par += quadro[i * 2];
+        par += quadro[i * 2 + 1];
+
+        if (par == "01") {
+            // 0: baixo -> alto (subida)
+            for (int j = 0; j < largura; j++) {
+                linha_high += " ";
+                linha_low  += "─";
+            }
+            linha_high += "┌";
+            linha_low  += "┘";
+            for (int j = 1; j < largura; j++) {
+                linha_high += "─";
+                linha_low  += " ";
+            }
+        } else {
+            // 1: alto -> baixo (descida)
+            for (int j = 0; j < largura; j++) {
+                linha_high += "─";
+                linha_low  += " ";
+            }
+            linha_high += "┐";
+            linha_low  += "└";
+            for (int j = 1; j < largura; j++) {
+                linha_high += " ";
+                linha_low  += "─";
             }
         }
     }
-        segunda_linha += "|";
-        terceira_linha += "|";
-        quarta_linha += "|";
-        quinta_linha += "|";
-        sexta_linha += "|";
-        setima_linha += "|";
-        oitava_linha += "|";
 
-        string moldura = construir_moldura(quinta_linha);
+    cout << linha_high << endl;
+    cout << linha_low << endl;
 
-        // Imprimindo gráfico no terminal
-        cout << moldura << endl;
-        cout << segunda_linha << endl;
-        cout << terceira_linha << endl;
-        cout << quarta_linha << endl;
-        cout << quinta_linha << endl;
-        cout << sexta_linha << endl;
-        cout << setima_linha << endl;
-        cout << oitava_linha << endl;
-        cout << moldura << endl;
+    if ((int)quadro.size() / 2 > MAX_BITS_EXIBIDOS) {
+        cout << "  ... (" << quadro.size() / 2 - MAX_BITS_EXIBIDOS << " bits restantes omitidos)" << endl;
+    }
 }
 
-// Função que administra a construção do gráfico de acordo com a codificação desejada.
-void construir_sinal(vector<char> quadro, int tipo_de_codificacao) {
-    switch (tipo_de_codificacao)
-    {
-    case 0: // Sinal Binário
-        construir_sinal_binario(quadro);
-        break;
-    case 1: // Sinal Manchester
-        construir_sinal_manchester(quadro);
-        break;
-    case 2: // Sinal Bipolar
-        construir_sinal_bipolar(quadro);
-        break;
+// Sinal Bipolar (AMI) — tres niveis: +1, 0, -1
+void construir_sinal_bipolar(vector<char> quadro) {
+    // Contar bits reais (sem '-')
+    int bits_reais = 0;
+    for (size_t i = 0; i < quadro.size(); i++) {
+        if (quadro[i] != '-') bits_reais++;
     }
+    int num_bits = min(bits_reais, MAX_BITS_EXIBIDOS);
+    int largura = 4;
+
+    // Reconstruir bits originais para a regua
+    cout << "  Bits: ";
+    int contagem = 0;
+    for (size_t i = 0; i < quadro.size() && contagem < num_bits; i++) {
+        if (quadro[i] == '-') continue;
+        if (quadro[i] == '0') {
+            cout << "0";
+        } else {
+            cout << "1";
+        }
+        for (int j = 1; j < largura; j++) cout << " ";
+        contagem++;
+    }
+    cout << endl;
+
+    string linha_pos  = "  +1  ";
+    string linha_zero = "   0  ";
+    string linha_neg  = "  -1  ";
+
+    contagem = 0;
+    char anterior_nivel = '0'; // 0 = zero, p = positivo, n = negativo
+
+    for (size_t i = 0; i < quadro.size() && contagem < num_bits; i++) {
+        if (quadro[i] == '-') continue;
+
+        char nivel;
+        if (quadro[i] == '0') {
+            nivel = '0';
+        } else if (i > 0 && quadro[i - 1] == '-') {
+            nivel = 'n';
+        } else {
+            nivel = 'p';
+        }
+
+        if (nivel == 'p') {
+            if (anterior_nivel == '0') {
+                linha_pos  += "┌";
+                linha_zero += "┘";
+                linha_neg  += " ";
+            } else if (anterior_nivel == 'n') {
+                linha_pos  += "┌";
+                linha_zero += "│";
+                linha_neg  += "┘";
+            } else {
+                linha_pos  += "─";
+                linha_zero += " ";
+                linha_neg  += " ";
+            }
+            for (int j = 1; j < largura; j++) {
+                linha_pos  += "─";
+                linha_zero += " ";
+                linha_neg  += " ";
+            }
+        } else if (nivel == 'n') {
+            if (anterior_nivel == '0') {
+                linha_pos  += " ";
+                linha_zero += "┐";
+                linha_neg  += "└";
+            } else if (anterior_nivel == 'p') {
+                linha_pos  += "┐";
+                linha_zero += "│";
+                linha_neg  += "└";
+            } else {
+                linha_pos  += " ";
+                linha_zero += " ";
+                linha_neg  += "─";
+            }
+            for (int j = 1; j < largura; j++) {
+                linha_pos  += " ";
+                linha_zero += " ";
+                linha_neg  += "─";
+            }
+        } else {
+            if (anterior_nivel == 'p') {
+                linha_pos  += "┐";
+                linha_zero += "└";
+                linha_neg  += " ";
+            } else if (anterior_nivel == 'n') {
+                linha_pos  += " ";
+                linha_zero += "┌";
+                linha_neg  += "┘";
+            } else {
+                linha_pos  += " ";
+                linha_zero += "─";
+                linha_neg  += " ";
+            }
+            for (int j = 1; j < largura; j++) {
+                linha_pos  += " ";
+                linha_zero += "─";
+                linha_neg  += " ";
+            }
+        }
+
+        anterior_nivel = nivel;
+        contagem++;
+    }
+
+    cout << linha_pos << endl;
+    cout << linha_zero << endl;
+    cout << linha_neg << endl;
+
+    if (bits_reais > MAX_BITS_EXIBIDOS) {
+        cout << "  ... (" << bits_reais - MAX_BITS_EXIBIDOS << " bits restantes omitidos)" << endl;
+    }
+}
+
+void construir_sinal(vector<char> quadro, int tipo_de_codificacao) {
+    cout << endl;
+    switch (tipo_de_codificacao) {
+        case 0: construir_sinal_binario(quadro); break;
+        case 1: construir_sinal_manchester(quadro); break;
+        case 2: construir_sinal_bipolar(quadro); break;
+    }
+    cout << endl;
 }
