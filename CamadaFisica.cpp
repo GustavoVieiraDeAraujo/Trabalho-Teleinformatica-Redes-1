@@ -218,7 +218,7 @@ string camada_de_aplicacao_receptora(vector<char> quadro) {
 
     for (int i = 0; i < quadro.size(); i += 8) {
         string byte;
-        for (int j = i; (j < (i + 8)); j++) {
+        for (int j = i; (j < (i + 8)) && (j < (int)quadro.size()); j++) {
             byte += quadro[j];
         }
 
