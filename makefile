@@ -1,9 +1,15 @@
-cpp_compile:
-		g++ ./*.cpp -o executar
+CXX = g++
+CXXFLAGS = -std=c++11 -Wall
+SRC = src/Simulador.cpp src/CamadaFisica.cpp src/MontagemGrafico.cpp src/Melhorias.cpp
+BIN = executar
 
-cpp_run:
-		./executar
+all: $(BIN)
 
-cpp_cr:
-		g++ ./*.cpp -o executar
-		./executar
+$(BIN): $(SRC)
+	$(CXX) $(CXXFLAGS) $(SRC) -o $(BIN)
+
+run: $(BIN)
+	./$(BIN)
+
+clean:
+	rm -f $(BIN)
