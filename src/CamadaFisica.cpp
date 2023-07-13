@@ -1,5 +1,5 @@
-#include "./CamadaFisica.hpp"
-#include "./MontagemGrafico.hpp"
+#include "../include/CamadaFisica.hpp"
+#include "../include/MontagemGrafico.hpp"
 
 #include <string>
 
