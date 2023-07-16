@@ -140,7 +140,7 @@ static vector<char> calcular_resto_crc(vector<char> dados) {
     }
 
     // Divisao por XOR
-    for (size_t i = 0; i <= dividendo.size() - polinomio.size(); i++) {
+    for (size_t i = 0; i + polinomio.size() <= dividendo.size(); i++) {
         if (dividendo[i] == '1') {
             for (size_t j = 0; j < polinomio.size(); j++) {
                 dividendo[i + j] = ((dividendo[i + j] - '0') ^ (polinomio[j] - '0')) + '0';
@@ -173,7 +173,11 @@ bool verificar_crc8(vector<char> quadro, vector<char>& dados_sem_crc) {
         }
     }
 
-    dados_sem_crc.assign(quadro.begin(), quadro.end() - 8);
+    if (quadro.size() >= 8) {
+        dados_sem_crc.assign(quadro.begin(), quadro.end() - 8);
+    } else {
+        dados_sem_crc.clear();
+    }
 
     if (valido) {
         cout << "[CRC-8] Nenhum erro detectado." << endl;
